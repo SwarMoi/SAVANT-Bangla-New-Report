@@ -6,6 +6,7 @@ format:
     toc: true
     code-fold: true
     code-tools: true
+    embed-resources: true
 execute:
   echo: true
   error: false
@@ -15,6 +16,7 @@ execute:
 
 ```{r}
 path <- getwd()
+level_order <- c('Gramm', 'CatViol', 'SemViol')
 ```
 
 # Load Libraries
@@ -364,15 +366,66 @@ Plot_wordSymbol_rh <-grid.arrange(wordVsymbols_bar_rh + theme_Publication_SwarMo
 
 ## Decomposition
 
-
-
 ### aROI - LMM
 
 #### Cluster 1
 
+```{r}
+col_names = c("Participant", "Item.no", "Prefix", "hemi", "wordFreq", "stemFreq", "ITEMNO", "Condition", "stim","dSPM")
+aROI_Cluster_1_Tark <- read_csv("data/M170/Tark_Cluster_1/aROI_Cluster_1_Tark.csv", col_names = col_names)
+
+GA_aROI_Cluster_1_Tark <- aROI_Cluster_1_Tark %>% filter(Condition != "SemViol" & Condition != "CatViol") %>%  group_by(Condition) %>% dplyr::summarise(GA_dSPM = mean(dSPM))
+
+knitr::kable(GA_aROI_Cluster_1_Tark)
+
+```
+
 #### Cluster 2
 
+```{r}
+# col_names = c("Participant", "Item.no", "Prefix", "hemi", "wordFreq", "stemFreq", "ITEMNO", "Condition", "stim","dSPM")
+# aROI_Cluster_2_Tark <- read_csv("data/M170/Tark_Cluster_1/aROI_Cluster_2_Tark.csv", col_names = col_names)
+# 
+# GA_aROI_Cluster_2_Tark <- aROI_Cluster_1_Tark %>% filter(Condition != "SemViol" & Condition != "CatViol") %>%  group_by(Condition) %>% dplyr::summarise(GA_dSPM = mean(dSPM))
+
+```
+
 #### Cluster 3
+
+### FROI
+
+```{r}
+col_names = c("Participant", "Item.no", "Prefix", "hemi", "wordFreq", "stemFreq", "ITEMNO", "Condition", "stim","dSPM")
+
+M170_Tark_fROI <- read_csv("data/M170/froi_TP_M170_Tark.csv", col_names = col_names)
+M170_Tark_fROI <- M170_Tark_fROI %>% 
+  filter(hemi == "dSPM-lh.stc") %>% 
+  filter(Condition != "SemViol" & Condition != "CatViol") %>%
+  select(-stim) %>% 
+  mutate (log_stemFreq = log(stemFreq), log_wordFreq =log(wordFreq), TP = (wordFreq/stemFreq), logTP = log(TP), logTP_div = (log_wordFreq/log_stemFreq))
+
+M170_Tark_fROI <- M170_Tark_fROI %>% 
+  mutate(
+    Participant = as.factor(Participant),
+    dSPM = as.numeric(dSPM),
+    Condition = as.factor(Condition),
+    item = as.factor(ITEMNO)
+  )
+
+#str(M170_Tark_fROI)
+
+M170_Tark_fROI$Prefix <- relevel(M170_Tark_fROI$Condition, ref="Gramm")
+
+M170_Tark_fROI_main <- lmer(dSPM ~ Condition * logTP_div + log_stemFreq + log_wordFreq + (1|Participant) + (1|ITEMNO), data = M170_Tark_fROI, REML = F)
+tab_model(M170_Tark_fROI_main)
+summary(M170_Tark_fROI_main)
+```
+
+```{r}
+library(interactions)
+
+interact_plot(M170_Tark_fROI_main, pred = "logTP_div", modx = "Condition", interval = TRUE, int.type = "confidence", int.width = .8, x.label = "Transition Probability", y.label = "dSPM", color.class = "Oranges")
+```
 
 ## Recomposition
 
@@ -391,8 +444,7 @@ X <- tribble(
 
 ```
 
-
-### TL:  RH_TemporalLobe_244-286_p0.0197
+### TL: RH_TemporalLobe_244-286_p0.0197
 
 ```{r}
 RH_Temporal <- read_csv("data/SAVANT/CatViol_RH_244-286_p0.0197.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
@@ -424,13 +476,13 @@ RH_temporal_plot <- RH_Temporal %>% filter(Condition != "Filler")  %>% ggplot(ae
 
 RH_temporal_plot
 ```
+
 ```{r}
 #| label: tbl-TL_rh
 
 
 knitr::kable(RH_Temporal)
 ```
-
 
 ### OF : LH OF 424-452_p0.0472
 
@@ -466,6 +518,7 @@ LH_OF_plot <- LH_OF %>% filter(Condition != "Filler")  %>% ggplot(aes(x= factor(
 
 LH_OF_plot
 ```
+
 ```{r}
 #| label: tbl-OF_lh
 
@@ -505,6 +558,7 @@ LH_OF_early_plot <- LH_OF_early %>% filter(Condition != "Filler")  %>% ggplot(ae
 
 LH_OF_early_plot
 ```
+
 ```{r}
 #| label: tbl-OF_early_lh
 
