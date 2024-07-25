@@ -55,7 +55,19 @@ source('data/Themes.R')
 
 # MEG
 
-## Tark Localiser (130 - 210)ms - Bilateral occipital and temporal regions
+## Tark Localiser
+
+6 conditions in this experiment, with 50 trials each. These conditions vary in length and Gaussian noise level as a visual mask. The trials were either 1-element or 4-element items. The 1-element items included 4 unique one-symbol items presented at the lowest Gaussian noise level (level 1), and 26 unique one-letter items presented at both the lowest (level 1) and highest Gaussian noise level (level 24). The one-symbol items were a triangle, a square, a diamond, or a circle **each containing a bar-diacritic over the element** and the one-letter items consisted single Bangla consonants. The 4-element items were 4-symbol strings presented only at the lowest Gaussian level (level 1) and 50 4-letter monomorphemic Bangla words presented at both noise level 1 and level 24. The four symbols used were again triangle, square, diamond, and circle, and were presented in four different permutations, joined together by a bar. Taking together we had a total of 300 trials in this experiment.
+
+Dummy coded design matrix (2x4)
+
+**Noise level** coded as 1:0 & 24:1
+
+**Stimulus Type** coded as letter:0, word:1, symbol:2, string of symbols:3
+
+## TYPE I (Working on it)
+
+## TYPE II Tark Localiser (130 - 210)ms - Bilateral occipital and temporal regions
 
 ```{r}
 tmin = 130
@@ -127,9 +139,9 @@ letterVsymbol_timeseries <- ggplot(letterVsymbol, aes(x = Time, y = dSPM, col = 
   geom_line(aes(group = paste(Condition)),size = 1) +
   
   
-  annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
+  #annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   annotate('text',x=(ls_min + ls_max)/2, y= 0.7, label ="*", size = 20) + 
-  annotate('rect',xmin=ls_min, xmax=ls_max, alpha=0.2,ymin=-Inf,ymax=Inf,fill="lightskyblue") + 
+  annotate('rect',xmin=ls_min, xmax=ls_max, alpha=0.2,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   # annotate('rect',xmin=tmin - 50, xmax=tmax + 50, alpha=0.1,ymin=-Inf,ymax=Inf,fill="green") + 
   # annotate('rect',xmin=-Inf, xmax=tmin, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#000000") + 
   # annotate('rect',xmin=tmax, xmax=Inf, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#666666") + 
@@ -218,9 +230,9 @@ wordVsymbols_timeseries_lh <- ggplot(wordVsymbols_lh, aes(x = Time, y = dSPM, co
   geom_line(aes(group = Condition),size = 1) +
   
   
-  annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
+  #annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   annotate('text',x=(ws_min_lh + ws_max_lh)/2, y= 0.7, label ="*", size = 20) + 
-  annotate('rect',xmin=ws_min_lh, xmax=ws_max_lh, alpha=0.2,ymin=-Inf,ymax=Inf,fill="lightskyblue") + 
+  annotate('rect',xmin=ws_min_lh, xmax=ws_max_lh, alpha=0.2,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   # annotate('rect',xmin=tmin - 50, xmax=tmax + 50, alpha=0.1,ymin=-Inf,ymax=Inf,fill="green") + 
   # annotate('rect',xmin=-Inf, xmax=tmin, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#000000") + 
   # annotate('rect',xmin=tmax, xmax=Inf, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#666666") + 
@@ -309,9 +321,9 @@ wordVsymbols_timeseries_rh <- ggplot(wordVsymbols_rh, aes(x = Time, y = dSPM, co
   geom_line(aes(group = Condition),size = 1) +
   
   
-  annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
+  #annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   annotate('text',x=(ws_min_rh + ws_max_rh)/2, y= 0.7, label ="*", size = 20) + 
-  annotate('rect',xmin=ws_min_rh, xmax=ws_max_rh, alpha=0.2,ymin=-Inf,ymax=Inf,fill="lightskyblue") + 
+  annotate('rect',xmin=ws_min_rh, xmax=ws_max_rh, alpha=0.2,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
   # annotate('rect',xmin=tmin - 50, xmax=tmax + 50, alpha=0.1,ymin=-Inf,ymax=Inf,fill="green") + 
   # annotate('rect',xmin=-Inf, xmax=tmin, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#000000") + 
   # annotate('rect',xmin=tmax, xmax=Inf, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#666666") + 
@@ -393,6 +405,8 @@ knitr::kable(GA_aROI_Cluster_1_Tark)
 #### Cluster 3
 
 ### FROI
+
+![](data/M170/fROI_M170.png){fig-align="center"}
 
 ```{r}
 col_names = c("Participant", "Item.no", "Prefix", "hemi", "wordFreq", "stemFreq", "ITEMNO", "Condition", "stim","dSPM")
@@ -529,6 +543,8 @@ LH_OF_plot
 
 knitr::kable(LH_OF)
 ```
+
+## Exploratory Analysis
 
 ### OF : LH_OF Early (238-279_p0.0049)
 
