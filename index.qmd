@@ -446,6 +446,8 @@ X <- tribble(
 
 ### TL: RH_TemporalLobe_244-286_p0.0197
 
+![](data/SAVANT/RH_CatViol01.png){fig-align="center"}
+
 ```{r}
 RH_Temporal <- read_csv("data/SAVANT/CatViol_RH_244-286_p0.0197.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
 RH_Temporal = RH_Temporal %>% left_join(X)
@@ -485,6 +487,8 @@ knitr::kable(RH_Temporal)
 ```
 
 ### OF : LH OF 424-452_p0.0472
+
+![](data/SAVANT/LH_OF.png){fig-align="center"}
 
 ```{r}
 LH_OF <- read_csv("data/SAVANT/OF_LH_424-452_p0.0472.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
@@ -527,6 +531,8 @@ knitr::kable(LH_OF)
 ```
 
 ### OF : LH_OF Early (238-279_p0.0049)
+
+![](data/SAVANT/LH_earlyOF.png){fig-align="center"}
 
 ```{r}
 LH_OF_early  <- read_csv("data/SAVANT/CatViol_LH_earlyOF_238-279_p0.0049.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
