@@ -93,15 +93,11 @@ p_ws_lh = 0.0173
 file_ws_lh = "data/Tark/word_symbols/TC_letterWord-nonLetterWord_bilateral occipital and temporal regions_0.163-0.197_lh_p0.0173.csv"
 ```
 
-Three Clusters were found!
+### Planned 
 
-1.  letter vs. symbol (RH)
 
-2.  word vs. symbols (LH)
 
-3.  word vs. symbols (RH)
-
-### 1st Cluster : letter vs symbol\| RH cluster (145 - 189)ms \| p = 0.0164
+#### letter vs symbol\| RH cluster (145 - 189)ms \| p = 0.0164
 
 ```{r}
 data <- read_csv(file_ls, col_names = c("Time", "Participant", "Item.no", "cond", "type","hemi", "dSPM"))
@@ -196,7 +192,11 @@ Plots_bars <- grid.arrange(letterVsymbol_bar + theme_Publication_SwarMoi() ,(let
 knitr::kable(letterVsymbol_Bar)
 ```
 
-### 2nd Cluster word vs. symbols: LH cluster (163 - 197)ms \| p = 0.0173
+### Exploratory 
+
+
+1. word vs. symbols (LH)
+#### Cluster word vs. symbols: LH cluster (163 - 197)ms \| p = 0.0173
 
 ```{r}
 data <- read_csv(file_ws_lh, col_names = c("Time", "Participant", "Item.no", "cond", "type","hemi", "dSPM"))
@@ -281,7 +281,8 @@ wordVsymbols_bar_lh <- ggplot(wordVsymbols_Bar_lh, aes(x=Condition, y=dSPM,fill=
 Plot_wordSymbol_lh <-grid.arrange(wordVsymbols_bar_lh + theme_Publication_SwarMoi() ,(wordVsymbols_timeseries_lh + theme_Publication_SwarMoi() +theme(legend.position = "none")),nrow=1, widths=c(4,9));
 ```
 
-### 3rd Cluster : RH cluster : 157 - 198 ms \| p =0.0196
+
+#### RH cluster : 157 - 198 ms \| p =0.0196
 
 ```{r}
 data <- read_csv(file_ws_rh, col_names = c("Time", "Participant", "Item.no", "cond", "type","hemi", "dSPM"))
