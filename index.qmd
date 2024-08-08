@@ -11,7 +11,7 @@ execute:
   echo: true
   error: false
   warning: false
-  cache: true
+  cache: false
 ---
 
 ```{r}
@@ -70,6 +70,7 @@ Analysis below is follwing Gwillams et al 2016
 **StimulusType**: symbol & letter
 
 `We removed 1 participant resulting in N=23 for the following Tark analysis`
+`MEG 92 sensor was not included in the analyses`
 
 ### Grand Average Plot
 
@@ -111,16 +112,18 @@ minsource = 20
 
 Consequently no analyses were performed for Type II Noise effect.
 
-### TYPE II Tark Localiser (130 - 180)ms - Bilateral occipital and temporal regions
+### TYPE II letter response (130 - 180)ms - Bilateral occipital and temporal regions
 
 StringType and Stimulus Type as predictors. String Type was coded as follows: symbols: 0, letters: 1; Stimulus Type was coded as follows: one element: 0, four elements:1 between 130-180ms in Bilateral Occipital and Temporal Regions.
 
 
-**String Typel** was coded as follows: symbols: 0, letters: 1;
+**String Type** was coded as follows: symbols: 0, letters: 1;
 
 **Stimulus Type** was coded as follows: one element: 0, four elements:1
 
 **Time window** : 130-180ms
+
+[**Only One CLUSTER WAS IDENTIFIED **]{.underline}
 
 ```
 Cluster:
