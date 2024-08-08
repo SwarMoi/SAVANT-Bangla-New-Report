@@ -1,13 +1,378 @@
 ---
-title: "Index"
-format: html
-editor: visual
+title: "Bangla MEG SaVANT Analysis"
+author: "Swarnendu Moitra"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-tools: true
+    embed-resources: true
+execute:
+  echo: true
+  error: false
+  warning: false
+  cache: true
 ---
 
-## July Report
+```{r}
+path <- getwd()
+level_order <- c('Gramm', 'CatViol', 'SemViol')
+```
 
-[JULY REPORT](July_Report.html)
+# Load Libraries
 
-## August Report
+```{r}
+library(lme4)
+library(tidyverse)
+library(glmm)
+library(ggplot2)
+library(afex)
+library(trimr)
+require(car)
+require(lattice)
+require(itsadug)
+library(ggpubr)
+library(languageR)
+library(plotrix)
+library(Hmisc)
+library(rlist)
+library(effects)
+library(sjPlot)
+library(effectsize)
+library(trimr)
+library(jtools)
+library(plotrix)
+library(ggpubr)
+library(gridExtra)
+library(grid)
+library(ggthemes)
+source('data/Themes.R')
+```
 
-[AUGUST REPORT](Aug_Report.html)
+# Behavioural
+
+## Online
+
+# MEG
+
+## PRE DECOMPOSITION
+
+### Tark Localiser
+
+6 conditions in this experiment, with 50 trials each. These conditions vary in length and Gaussian noise level as a visual mask. The trials were either 1-element or 4-element items. The 1-element items included 4 unique one-symbol items presented at the lowest Gaussian noise level (level 1), and 26 unique one-letter items presented at both the lowest (level 1) and highest Gaussian noise level (level 24). The one-symbol items were a triangle, a square, a diamond, or a circle **each containing a bar-diacritic over the element** and the one-letter items consisted single Bangla consonants. The 4-element items were 4-symbol strings presented only at the lowest Gaussian level (level 1) and 50 4-letter monomorphemic Bangla words presented at both noise level 1 and level 24. The four symbols used were again triangle, square, diamond, and circle, and were presented in four different permutations, joined together by a bar. Taking together we had a total of 300 trials in this experiment.
+
+Analysis below is follwing Gwillams et al 2016
+
+**Length**: 1 & 4
+
+**Noise**: Level 1 & Level 24
+
+**StimulusType**: symbol & letter
+
+`We removed 1 participant resulting in N=23 for the following Tark analysis`
+
+### Grand Average Plot
+
+![Grand Average Plot: Tark](data/Plots/2024_AUG_v1.0.Tark_avg_evoked_n23_Tark.png){fig-align="center"}
+
+```         
+```
+
+#### Left Posterior Channels
+
+![](data/Plots/Left_evoked_Tark.png){fig-align="center"}
+
+![](data/Plots/2024_AUG_v1.0.Tark_avg_LeftPosterior_evoked_n23_Tark.png){fig-align="center"}
+
+#### Right Posterior Channels
+
+![](data/Plots/Right_evoked_Tark.png){fig-align="center"}
+
+![](data/Plots/2024_AUG_v1.0.Tark_avg_RightPosterior_evoked_n23_Tark.png){fig-align="center"}
+
+### TYPE I Noise Effect
+
+**Noise Level** was coded as follows: 1: 0, 24: 1;
+
+**Stimulus Type** was coded as follows: letter: 0, word: 1.
+
+**Time window** : 80-130ms
+
+params
+
+```         
+samples = 10000
+pmin = 0.05
+mintime = 0.020
+minsource = 20
+```
+
+[**NO SIGNIFICANT CLUSTERS WERE IDENTIFIED for Type I noise**]{.underline}
+
+Consequently no analyses were performed for Type II Noise effect.
+
+### TYPE II Tark Localiser (130 - 180)ms - Bilateral occipital and temporal regions
+
+StringType and Stimulus Type as predictors. String Type was coded as follows: symbols: 0, letters: 1; Stimulus Type was coded as follows: one element: 0, four elements:1 between 130-180ms in Bilateral Occipital and Temporal Regions.
+
+
+**String Typel** was coded as follows: symbols: 0, letters: 1;
+
+**Stimulus Type** was coded as follows: one element: 0, four elements:1
+
+**Time window** : 130-180ms
+
+```
+Cluster:
+
+130-161ms
+vertices=1781.88
+p=0.0943
+```
+
+```{r}
+file_ws_rh <- "data/TC_Tark_RH.csv"
+ws_min_rh = 130
+ws_max_rh = 161
+p_ws_rh = 0.0943
+
+
+data <- read_csv(file_ws_rh, col_names = c("Time", "Participant", "Item.no", "cond", "type","hemi", "dSPM"))
+data$Condition <- paste((data$cond),(data$type))
+data$Time <- data$Time*1000
+#unique(data$Condition)
+wordVsymbols_rh <- data %>% filter(Participant != "B0025") %>%  filter(((cond == "word" & type =="clean") | (cond == "word" & type =="symbols") ))
+wordVsymbols_rh$Condition[wordVsymbols_rh$Condition == "word clean" ] <- "Letter"
+wordVsymbols_rh$Condition[wordVsymbols_rh$Condition == "word symbols" ] <- "Symbol"
+wordVsymbols_rh <- wordVsymbols_rh %>% 
+                  dplyr::group_by(
+                    Time,
+                    Condition,
+                    hemi
+                  ) %>%
+                  dplyr::summarise(
+                    SE = std.error(dSPM),
+                    dSPM = mean(dSPM)
+                  )
+wordVsymbols_rh <- wordVsymbols_rh %>% filter(hemi == "dSPM-rh.stc")
+#wordVsymbols_lh$Condition = with(wordVsymbols_lh, reorder(Word, Symbols)
+wordVsymbols_Bar_rh <- wordVsymbols_rh %>% filter(Time>= ws_min_rh & Time <= ws_max_rh) %>% dplyr::group_by(Condition) %>% dplyr::summarise(SE = std.error(dSPM), dSPM = mean(dSPM)) 
+wordVsymbols_Bar_rh <- wordVsymbols_Bar_rh %>% mutate(Condition = as.factor(Condition))
+wordVsymbols_Bar_rh$Condition <- relevel(wordVsymbols_Bar_rh$Condition, ref = "Letter")
+```
+
+```{r}
+#| label: tbl-wordVsymbols_rh_new
+
+
+knitr::kable(wordVsymbols_Bar_rh)
+```
+
+```{r}
+#| label: fig-word_symbols_rh
+#| 
+wordVsymbols_timeseries_rh <- ggplot(wordVsymbols_rh, aes(x = Time, y = dSPM, col = Condition, linetype = Condition)) + 
+  geom_line(aes(group = Condition),size = 1) +
+  
+  
+  #annotate('rect',xmin=tmin, xmax=tmax, alpha=0.12,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
+  annotate('text',x=(ws_min_rh + ws_max_rh)/2, y= 0.7, label ="*", size = 20) + 
+  annotate('rect',xmin=ws_min_rh, xmax=ws_max_rh, alpha=0.2,ymin=-Inf,ymax=Inf,fill="darkgrey") + 
+  # annotate('rect',xmin=tmin - 50, xmax=tmax + 50, alpha=0.1,ymin=-Inf,ymax=Inf,fill="green") + 
+  # annotate('rect',xmin=-Inf, xmax=tmin, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#000000") + 
+  # annotate('rect',xmin=tmax, xmax=Inf, alpha=0.075,ymin=-Inf,ymax=Inf,fill="#666666") + 
+  # scale_colour_manual("",values=c("#E63946","#276FBF",  "#545083", "#FF8888", "#FF0000", "#FF8888")) +
+  scale_colour_manual("",values=c("deeppink","dodgerblue",  "#545083", "#FF8888", "#FF0000", "#FF8888")) +
+  scale_linetype_manual("",values=c("solid", "twodash", "solid", "dashed", "solid", "dashed")) +
+  # scale_fill_manual("",values=c("#E63946","#545083",  "#545083", "#FF8888", "#FF0000", "#FF8888")) +
+  geom_ribbon(aes(ymin = dSPM - SE, ymax = dSPM + SE, fill = Condition, group=Condition), alpha = 0.2, col = NA, show.legend = FALSE) + 
+  scale_y_continuous("Activation (dSPM)",expand=c(0,0), limits = c(-1.5, 1.5)) + scale_x_continuous("Time (ms)", expand=c(0,0), limits = c(-50, 350)) + theme(legend.position="bottom") +
+   theme_minimal() + theme(panel.grid.major = element_blank(),
+                                                   panel.grid.minor = element_blank(),
+                                                   axis.title = element_text(size = 14, face = "bold"),
+                                                   axis.text = element_text(size = 12), legend.position = "none") +
+  
+  geom_hline(yintercept=0, linetype="dotted") + geom_vline(xintercept=0, linetype="dotted")
+
+wordVsymbols_bar_rh <- ggplot(wordVsymbols_Bar_rh, aes(x=Condition, y=dSPM,fill=Condition)) + 
+  geom_bar(stat = "identity", width = 0.7, position = position_dodge(0.7), show.legend = FALSE, color="#545083"  )+
+  #scale_x_discrete(limits = Conditions) +  facet_wrap( ~Prefix) +
+  ylab("dSPM") + 
+  xlab("Conditions") +
+  scale_fill_manual("",values=c("deeppink","dodgerblue",  "#545083", "#FF8888", "#FF0000", "#FF8888")) +
+  #theme_Publication()+
+  # coord_cartesian(ylim = c(0, 1150)) +
+  # scale_y_continuous(expand = expansion(mult = c(0, 0.05)))+
+  # geom_signif(
+  #   comparisons = list(c("Grammatical", "Pseudowords")),
+  #   margin_top = 0.8,
+  #   step_increase = 0.09,
+  #   tip_length = 0.5,
+  #   annotation = c("***")
+  # )+
+   geom_hline(yintercept=0, linetype="dotted") + geom_vline(xintercept=0, linetype="dotted") +
+   theme_minimal() + theme(panel.grid.major = element_blank(),
+                                                   panel.grid.minor = element_blank(),
+                                                   axis.title = element_text(size = 14, face = "bold"),
+                                                   axis.text = element_text(size = 12)) +
+  #geom_errorbar function is used to plot error bars
+  geom_errorbar(aes(ymin=dSPM-SE,
+                     ymax=dSPM+SE,
+                 width=0.3))
+
+
+
+```
+
+```{r}
+Plot_wordSymbol_rh <-grid.arrange(wordVsymbols_bar_rh + theme_Publication_SwarMoi() ,(wordVsymbols_timeseries_rh + theme_Publication_SwarMoi() +theme(legend.position = "none")),nrow=1, widths=c(4,9))
+```
+
+![RH Cluster 130-161ms \| p=0.0943](data/Plots/Cluster_10.13-0.161_p0.0943_both_ventral-brainCluster.png){fig-align="center"}
+
+## POST DECOMPOSITION
+
+```{r}
+X <- tribble(
+  ~Prefix, ~Condition, ~PrefixType,
+  "CatViolDU", "CatViol", "DU", 
+  "CatViolPROTI", "CatViol","PROTI", 
+  "GrammDU", "Gramm","DU",
+  "GrammPROTI", "Gramm","PROTI",
+  "SemViolDU", "SemViol","DU",
+  "SemViolPROTI", "SemViol","PROTI",
+  "Filler", "Filler","Fill",
+)
+
+
+```
+
+### TL: RH_TemporalLobe_244-286_p0.0197
+
+![](data/SAVANT/RH_CatViol01.png){fig-align="center"}
+
+```{r}
+RH_Temporal <- read_csv("data/SAVANT/CatViol_RH_244-286_p0.0197.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
+RH_Temporal = RH_Temporal %>% left_join(X)
+RH_Temporal <- RH_Temporal %>% select(!hemi)  %>% group_by(Condition) %>% summarise(SE = std.error(dSPM),dSPM = mean(dSPM))
+RH_Temporal_TC <- read_csv("data/SAVANT/TC_CatViol_RH_244-286_p0.0197.csv", col_names = c("time", "Participant", "Prefix","hemi", "dSPM"))
+RH_Temporal_TC = RH_Temporal_TC %>% left_join(X)
+
+RH_Temporal_TC$time = RH_Temporal_TC$time*1000
+
+RH_Temporal_TC <- RH_Temporal_TC %>% filter(between(time, 244, 286)) %>% group_by(Condition) %>% summarise(SE = std.error(dSPM),
+                    dSPM = mean(dSPM))
+
+RH_temporal_plot <- RH_Temporal %>% filter(Condition != "Filler")  %>% ggplot(aes(x= factor(Condition, level = level_order),y=dSPM,fill=Condition)) +
+  # geom_bar function is used to plot bars of barplot
+  geom_bar(stat = "identity", width = 0.95, position = position_dodge(0.1), show.legend = FALSE  )+
+  #scale_x_discrete(limits = Conditions) +  facet_wrap( ~Prefix) +
+  ylab("dSPM") + 
+  xlab("Conditions") +
+  scale_fill_manual(values = c("blue" , "green" ,"red"))+
+   geom_errorbar(aes(ymin=dSPM-SE,
+                    ymax=dSPM+SE,
+                 width=0.3))+ 
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 15, angle = 0, hjust = .5, vjust = .5, face = "plain"),
+        axis.text.y = element_text(size = 15, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(size = 18, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(size = 18, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+
+RH_temporal_plot
+```
+
+```{r}
+#| label: tbl-TL_rh
+
+
+knitr::kable(RH_Temporal)
+```
+
+### OF : LH OF 424-452_p0.0472
+
+![](data/SAVANT/LH_OF.png){fig-align="center"}
+
+```{r}
+LH_OF <- read_csv("data/SAVANT/OF_LH_424-452_p0.0472.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
+LH_OF = LH_OF %>% left_join(X)
+LH_OF <- LH_OF %>% select(!hemi)  %>% group_by(Condition,Prefix, PrefixType) %>% summarise(SE = std.error(dSPM),
+                    dSPM = mean(dSPM))
+LH_OF_TC <- read_csv("data/SAVANT/TC_OF_LH_424-452_p0.0472.csv", col_names = c("time", "Participant", "Prefix","hemi", "dSPM"))
+LH_OF_TC = LH_OF_TC %>% left_join(X)
+LH_OF_TC$time = LH_OF_TC$time*1000
+LH_OF_TC <- LH_OF_TC %>% filter(between(time, 424, 452)) %>% group_by(Condition, Prefix, PrefixType) %>% summarise(SE = std.error(dSPM),
+                    dSPM = mean(dSPM))
+
+
+LH_OF_plot <- LH_OF %>% filter(Condition != "Filler")  %>% ggplot(aes(x= factor(Condition, level = level_order),y=dSPM,fill=Condition)) +
+  # geom_bar function is used to plot bars of barplot
+  geom_bar(stat = "identity", width = 0.99, position = position_dodge(0.1), show.legend = FALSE  )+
+  #scale_x_discrete(limits = Conditions) +  facet_wrap( ~Prefix) +
+  ylab("dSPM") + 
+  xlab("Conditions") +
+  facet_wrap(~PrefixType) +
+  # scale_fill_manual(values = c("blue", "lightblue" , "green", "lightgreen" ,"red", "pink"))+
+   scale_fill_manual(values = c("blue",  "green","red"))+
+   geom_errorbar(aes(ymin=dSPM-SE,
+                    ymax=dSPM+SE,
+                 width=0.3))+ 
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 18, angle = 0, hjust = .5, vjust = .5, face = "plain"),
+        axis.text.y = element_text(size = 15, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(size = 18, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(size = 18, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+
+LH_OF_plot
+```
+
+```{r}
+#| label: tbl-OF_lh
+
+
+knitr::kable(LH_OF)
+```
+
+## Exploratory Analysis
+
+### OF : LH_OF Early (238-279_p0.0049)
+
+![](data/SAVANT/LH_earlyOF.png){fig-align="center"}
+
+```{r}
+LH_OF_early  <- read_csv("data/SAVANT/CatViol_LH_earlyOF_238-279_p0.0049.csv", col_names = c("Participant", "Prefix","hemi", "dSPM"))
+LH_OF_early = LH_OF_early %>% left_join(X)
+
+LH_OF_early <- LH_OF_early %>% select(!hemi)  %>% group_by(Condition) %>% summarise(SE = std.error(dSPM),
+                    dSPM = mean(dSPM))
+LH_OF_early_TC <- read_csv("data/SAVANT/TC_CatViol_LH_earlyOF_238-279_p0.0049.csv", col_names = c("time", "Participant", "Prefix","hemi", "dSPM"))
+LH_OF_early_TC = LH_OF_early_TC %>% left_join(X)
+LH_OF_early_TC$time = LH_OF_early_TC$time*1000
+LH_OF_early_TC <- LH_OF_early_TC %>% filter(between(time, 238, 279)) %>% group_by(Condition) %>% summarise(SE = std.error(dSPM),
+                    dSPM = mean(dSPM))
+
+LH_OF_early_plot <- LH_OF_early %>% filter(Condition != "Filler")  %>% ggplot(aes(x= factor(Condition, level = level_order),y=dSPM,fill=Condition)) +
+  # geom_bar function is used to plot bars of barplot
+  geom_bar(stat = "identity", width = 0.95, position = position_dodge(0.1), show.legend = FALSE  )+
+  #scale_x_discrete(limits = Conditions) +  facet_wrap( ~Prefix) +
+  ylab("dSPM") + 
+  xlab("Conditions") +
+  scale_fill_manual(values = c("blue" , "green" ,"red"))+
+   geom_errorbar(aes(ymin=dSPM-SE,
+                    ymax=dSPM+SE,
+                 width=0.3))+ 
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 15, angle = 0, hjust = .5, vjust = .5, face = "plain"),
+        axis.text.y = element_text(size = 15, angle = 0, hjust = 1, vjust = 0, face = "plain"),  
+        axis.title.x = element_text(size = 18, angle = 0, hjust = .5, vjust = 0, face = "plain"),
+        axis.title.y = element_text(size = 18, angle = 90, hjust = .5, vjust = .5, face = "plain"))
+
+LH_OF_early_plot
+```
+
+```{r}
+#| label: tbl-OF_early_lh
+
+
+knitr::kable(LH_OF_early)
+```
