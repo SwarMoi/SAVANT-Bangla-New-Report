@@ -1,0 +1,97 @@
+---
+title: "Bangla Corpus"
+author: "Swarnendu Moitra"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-tools: true
+    embed-resources: true
+execute:
+  echo: true
+  error: false
+  warning: false
+  cache: false
+---
+
+### Objective
+
+The aim of is to construct a lexical database for the low-resource language Bangla by leveraging and enhancing available Natural Language Processing (NLP) tools. The primary objective is to derive lexical statistics such as stem frequency, whole word frequency, and transitional probabilities. A secondary objective is to compute additional lexical statistics, including n-gram frequencies.
+
+### Data Source
+
+Our principal dataset is sourced from the IndicNLP Bangla Newspaper Corpus (<https://github.com/AI4Bharat/indicnlp_corpus>), encompassing **836 million tokens**.
+
+### Methodology
+
+#### Data Preprocessing
+
+##### Data Cleaning
+
+Although the dataset had been preprocessed, further cleaning was undertaken to eliminate metadata, HTML tags, and inconsistent formatting. We normalized the text by standardizing different forms of text variations, such as handling spelling inconsistencies.
+
+##### Tokenization
+
+We generated two primary corpora for analysis:
+
+1.  **Tokenized Sentences Corpus**: Created by identifying sentence endings using the Bangla punctuation mark (।) and placing each sentence on a new line, saved as `tokenized_sen.txt`.
+
+2.  **Tokenized Words Corpus**: Created by placing each word on a separate line, saved as `tokenized_words.txt`.
+
+## Attempt 1: Initial Lexical Statistics Calculation
+
+For our initial attempt at calculating lexical statistics, we employed pattern matching techniques:
+
+-   **Whole Word Frequency**: Exact matches for the stimuli were counted.
+
+-   **Stem Frequency**: Utilized the Python `text` function `contains` for pattern matching. Counters were incremented for each match corresponding to either the whole word frequency or stem frequency.
+
+To normalize the resultant data, both whole word frequency and stem frequency counts were divided by 836 million to derive Parts Per Million (PPM) counts.
+
+##### Issues Encountered
+
+The stem frequency counts were found to be significantly inflated.
+
+## Attempt 2: Enhanced Stemming Approach
+
+To address the issues encountered in Attempt 1, we focused on using a stemming algorithm. We evaluated several Bangla stemmers and selected the `bangla-stemmer` (available at <https://pypi.org/project/bangla-stemmer/>) for its relative accuracy of `56%.`
+
+![Verbal Afiixes](images/Screenshot%202024-08-08%20at%2012.35.26.png)
+
+##### Stemming Modifications
+
+-   The `bangla-stemmer` is a rule-based stemmer that originally stripped Bangla inflectional suffixes.
+
+-   We extended the stemmer to include rules for prefix stripping and derivational affix stripping.
+
+-   After manually checking and annotating 1230 highest frequency words in Bangla, the accuracy of our modified stemmer increased to approximately `76%`.
+
+**Note**: The stemmer operates independently of word categories and applies a generalized stemming process.
+
+##### Issues Encountered
+
+Despite improvements, the stemmer exhibited over-stemming, particularly for nominal words due to the differential affix combination rules in Bangla nouns versus verbs. Additionally, handling compound words presented further challenges.
+
+## Attempt 3: Varied approch for Stemming + POS
+
+To address the above issues, we are presently testing and training POStagger with the following stemmers
+
+![Stemmers tested but the accuracy is based on predominantly verbal inlections](images/Screenshot%202024-08-08%20at%2012.32.58.png)
+
+![](images/Screenshot%202024-08-08%20at%2012.38.43.png){fig-align="center"}
+
+Following <https://aclanthology.org/2020.icon-main.55/> proposed algorithm we are presently upgrading our stemmer.
+
+## Remarks
+
+Specific issues remain with the stemmer
+
+1.  Identifying/Upgrade existing POS and stemmer to address compound stemming.
+
+2.  Create an exhaustive exception list for irregular word forms and compounds which would bypass the stemmer if matched and with output human annotated values.
+
+3.  For validation, train a smaller POS annotated dataset for calculating Parsing Accuracy.
+
+4.  Upgrade our stemmer with the proposed algo for category specific affix stripping and adding derivational rules.
+
+[Github Repo for Bangla Stemmer](https://github.com/SwarMoi/LexiVault-Bangla-stemmer "LexiVault Bangla Stemmer")
