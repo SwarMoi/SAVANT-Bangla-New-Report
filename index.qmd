@@ -11,7 +11,7 @@ execute:
   echo: true
   error: false
   warning: false
-  cache: false
+  cache: true
 ---
 
 ```{r}
@@ -69,8 +69,7 @@ Analysis below is follwing Gwillams et al 2016
 
 **StimulusType**: symbol & letter
 
-`We removed 1 participant resulting in N=23 for the following Tark analysis`
-`MEG 92 sensor was not included in the analyses`
+`We removed 1 participant resulting in N=23 for the following Tark analysis` `MEG 92 sensor was not included in the analyses`
 
 ### Grand Average Plot
 
@@ -116,16 +115,15 @@ Consequently no analyses were performed for Type II Noise effect.
 
 StringType and Stimulus Type as predictors. String Type was coded as follows: symbols: 0, letters: 1; Stimulus Type was coded as follows: one element: 0, four elements:1 between 130-180ms in Bilateral Occipital and Temporal Regions.
 
-
 **String Type** was coded as follows: symbols: 0, letters: 1;
 
 **Stimulus Type** was coded as follows: one element: 0, four elements:1
 
 **Time window** : 130-180ms
 
-[**Only One CLUSTER WAS IDENTIFIED **]{.underline}
+[**Only One CLUSTER WAS IDENTIFIED**]{.underline}
 
-```
+```         
 Cluster:
 
 130-161ms
@@ -231,24 +229,78 @@ wordVsymbols_bar_rh <- ggplot(wordVsymbols_Bar_rh, aes(x=Condition, y=dSPM,fill=
 Plot_wordSymbol_rh <-grid.arrange(wordVsymbols_bar_rh + theme_Publication_SwarMoi() ,(wordVsymbols_timeseries_rh + theme_Publication_SwarMoi() +theme(legend.position = "none")),nrow=1, widths=c(4,9))
 ```
 
-![RH Cluster 130-161ms \| p=0.0943](data/Plots/Cluster_10.13-0.161_p0.0943_both_ventral-brainCluster.png){fig-align="center"}
+## ![RH Cluster 130-161ms \| p=0.0943](data/Plots/Cluster_10.13-0.161_p0.0943_both_ventral-brainCluster.png){fig-align="center"} Decomposition
+
+#### Lexical Statistics generated from LexiVault + indicNLP 
+
+##### **Corpus Overview:** indicNLP 
+
+-   **Language:** Bengali (bn)
+
+-   **Corpus Size:** 7.2 million sentences, 100 million tokens
+
+**Data Processing Steps:**
+
+1.  **Corpus Preparation:**
+
+    -   The raw corpus was first subjected to normalization and cleaning procedures.
+
+    -   The cleaned corpus was then divided into manageable chunks to facilitate further processing.
+
+2.  **Part-of-Speech Tagging (POS Tagging):**
+
+    -   POS tagging was performed using the BNLP tool available at [BNLP GitHub repository](https://github.com/sagorbrur/bnlp).
+
+    -   As of September 17, 2024, 3.2 million sentences from the corpus have been successfully POS tagged.
+
+3.  **Stemming:**
+
+    -   Depending on the POS tags assigned, tokens were stemmed using the LexiVault Rule-Based Stemmer, accessible at [LexiVault GitHub repository](https://github.com/SwarMoi/LexiVault-Bangla-stemmer).
+
+4.  **Data Extraction and Normalization:**
+
+    -   Stimuli containing both stemmed and whole-word forms were queried and extracted from the tagged corpus.
+
+    -   To ensure consistency, token counts were normalized using per million counts.
+
+**Current Status:**
+
+-   `As of September 17, 2024`, a total of 3.2 million sentences have been POS tagged and stemmed from the Bengali corpus.
+
+##### **Corpus Overview: SketchEngine \[bnTenTen21\]**
+
+-   **Language:** Bengali (bn)
+
+-   **Corpus Size:** 40mil sentences, 541 mil tokens
+
+1.  **Data Extraction and Normalization:**
+
+    -   The stimuli were queried and the Per Million counts are extracted
+
+> The total frequency counts per million were aggregated, and a regressor file was prepared. We verified that the WholeWordFreq counts were less than the StemFreq counts. This data was then used in regression analysis and for generating correlation plots.
+
+### Left Fusiform gyrus (160 - 179ms) p=0.01
+
+![Left Fusiform gyrus (160-179ms) p=0.01](images/M170_Brain_plot.png){width="430"}
+
+![](images/M170_Correlations.png){width="432"}
 
 ## POST DECOMPOSITION
 
 ```{r}
-X <- tribble(
-  ~Prefix, ~Condition, ~PrefixType,
-  "CatViolDU", "CatViol", "DU", 
-  "CatViolPROTI", "CatViol","PROTI", 
-  "GrammDU", "Gramm","DU",
-  "GrammPROTI", "Gramm","PROTI",
-  "SemViolDU", "SemViol","DU",
-  "SemViolPROTI", "SemViol","PROTI",
-  "Filler", "Filler","Fill",
-)
-
 
 ```
+
+X \<- tribble(
+\~Prefix, \~Condition, \~PrefixType,
+"CatViolDU", "CatViol", "DU",
+"CatViolPROTI", "CatViol","PROTI",
+"GrammDU", "Gramm","DU",
+"GrammPROTI", "Gramm","PROTI",
+"SemViolDU", "SemViol","DU",
+"SemViolPROTI", "SemViol","PROTI",
+"Filler", "Filler","Fill",
+)
 
 ### TL: RH_TemporalLobe_244-286_p0.0197
 
